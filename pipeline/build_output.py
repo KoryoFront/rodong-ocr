@@ -18,6 +18,11 @@ arts = json.load(open(args.articles_raw, encoding='utf-8'))
 cur = json.load(open(args.curation, encoding='utf-8'))
 issue = cur['issue']
 kiwi = Kiwi()
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dprk_words.txt'), encoding='utf-8') as wf:
+    for w in wf:
+        w = w.strip()
+        if w and not w.startswith('#'):
+            kiwi.add_user_word(w, 'NNG')
 DPRK_INITIAL = set('련로력리량녀령론래례류륙락란람랑렬렴뢰룡루륜률륭름릉린림립료롱록뇨뉴닉')
 
 

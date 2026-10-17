@@ -22,10 +22,15 @@ def gap(a, b):
     dy = max(0, max(a[1], b[1]) - min(a[3], b[3]))
     return np.hypot(dx, dy)
 
-def is_junk(t):
-    """Ornamental borders/rules that the recognizer reads as runs of symbols or zeros."""
-    t = t.strip()
-    return bool(re.search(r'[∞×$]', t) or re.search(r'[0oO8X]{6,}', t) or set(t) <= set('…·.-—_~ |'))
+def is_junk(line):
+    """Ornamental borders/rules and photo texture that the recognizer reads as runs of symbols, zeros
+    or ones (e.g. a ++++ border read as 111114111). Real text without Hangul (dates, page numbers)
+    is read with high confidence and no long repeats."""
+    t = line['text'].strip()
+    if re.search(r'[∞×$]', t) or re.search(r'[0oO8X]{6,}', t) or set(t) <= set('…·.-—_~ |'):
+        return True
+    no_hangul = not any('가' <= ch <= '힣' for ch in t)
+    return no_hangul and (line['score'] < 0.7 or bool(re.search(r'(.)\1{3,}', t)))
 
 def is_vertical(b):
     return (b[3] - b[1]) > 2.5 * (b[2] - b[0])
@@ -145,7 +150,7 @@ def merge_overlapping(blocks):
     return out
 
 def page_articles(stage, name, overrides):
-    lines = [l for l in json.load(open(f'{stage}/{name}_ocr.json', encoding='utf-8')) if not is_junk(l['text'])]
+    lines = [l for l in json.load(open(f'{stage}/{name}_ocr.json', encoding='utf-8')) if not is_junk(l)]
     blocks = merge_overlapping(json.load(open(f'{stage}/{name}_layout.json', encoding='utf-8')))
     regions = [r['box'] for r in json.load(open(f'{stage}/{name}_region.json', encoding='utf-8'))]
     regions += overrides.get('add_regions', [])
