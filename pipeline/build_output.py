@@ -87,17 +87,11 @@ for idx in cur['order']:
 if args.json:
     json.dump(items, open(args.json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
-NOTE = ('본문은 PaddleOCR PP-OCRv5 (한국어 인식 모델 + PP-OCRv5 서버 검출 모델)로 인식하였고, PP-DocLayout_plus-L / '
-        'PP-DocBlockLayout으로 기사 영역을 나눈 뒤 단 순서대로 재구성하였다. 띄여쓰기는 인식 모델이 자주 빠뜨려 Kiwi 형태소 '
-        '분석기로 자동 복원하였다 (일부 오류 가능). 제목·부제목·사진설명은 원본 지면을 직접 확인하여 교정하였고, 본문은 교정하지 '
-        '않은 OCR 결과이다.')
-
 # ---------- plain text ----------
 RULE = '=' * 72
 with open(args.txt, 'w', encoding='utf-8', newline='\n') as f:
     f.write(f"{issue['paper']} {issue['date']} {issue['number']}\n")
     f.write(f"원본: {issue['source']} · {issue['pages']}면 · 기사 {len(items)}건\n")
-    f.write(NOTE + '\n')
     for n, it in enumerate(items, 1):
         f.write(f'\n{RULE}\n')
         f.write(f"기사 {n:02d} · 제{it['page']}면\n")
@@ -159,7 +153,7 @@ if args.pdf:
     story = [Spacer(1, 50 * mm), P(issue['paper'], 'cover_t'), Spacer(1, 4 * mm),
              P(f"{issue['date']} · {issue['number']}", 'cover_s'),
              P(f"기사 {len(items)}건 · {issue['pages']}면", 'cover_s'), Spacer(1, 30 * mm),
-             P(f"원본: {issue['source']}. " + NOTE, 'note'),
+             P(f"원본: {issue['source']}", 'note'),
              PageBreak(), P('차례', 'title')]
     for pg in sorted({it['page'] for it in items}):
         story.append(P(f'제{pg}면', 'toc_h'))
