@@ -1,0 +1,6 @@
+.venv*/
+__pycache__/
+pages/
+*.pyc
+issues/*/stage/*.png
+issues/*/*_articles.pdf
